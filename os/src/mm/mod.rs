@@ -5,22 +5,40 @@
 //! map area and memory set, is implemented here.
 //!
 //! Every task or process has a memory_set to control its virtual memory.
-mod address;
-mod frame_allocator;
-mod heap_allocator;
-mod memory_set;
+pub mod addr_space;
+pub mod elf;
+pub mod mmap;
+pub mod shm;
+pub mod user_ptr;
+pub mod vm_area;
+
+#[cfg(target_arch = "riscv64")]
+pub mod iomap;
+
 mod page_table;
 
-pub use address::{PhysAddr, PhysPageNum, VirtAddr, VirtPageNum};
-use address::{StepByOne, VPNRange};
-pub use frame_allocator::{frame_alloc, FrameTracker};
-pub use memory_set::remap_test;
-pub use memory_set::{MapPermission, MemorySet, KERNEL_SPACE};
-pub use page_table::{translated_byte_buffer, translated_refmut, translated_str, PageTableEntry};
-use page_table::{PTEFlags, PageTable};
-/// initiate heap allocator, frame allocator and kernel space
-pub fn init() {
-    heap_allocator::init_heap();
-    frame_allocator::init_frame_allocator();
-    KERNEL_SPACE.exclusive_access().activate();
-}
+pub use page:page_table:switch_to_kernel_space;
+
+#[allow(unused_imports)]
+pub use page_table:: trace_page_table_lookup;
+
+#[cfg(target_arch = "riscv64")]
+pub use page_table::KERNEL_PAGE_TABLE;
+
+#[cfg(target_arch = "riscv64")]
+#[allow(unused_imports)]
+pub use page_table::trace_kernel_page_table_lookup;
+
+// pub use address::{PhysAddr, PhysPageNum, VirtAddr, VirtPageNum};
+// use address::{StepByOne, VPNRange};
+// pub use frame_allocator::{frame_alloc, FrameTracker};
+// pub use memory_set::remap_test;
+// pub use memory_set::{MapPermission, MemorySet, KERNEL_SPACE};
+// pub use page_table::{translated_byte_buffer, translated_refmut, translated_str, PageTableEntry};
+// use page_table::{PTEFlags, PageTable};
+// /// initiate heap allocator, frame allocator and kernel space
+// pub fn init() {
+//     heap_allocator::init_heap();
+//     frame_allocator::init_frame_allocator();
+//     KERNEL_SPACE.exclusive_access().activate();
+// }
